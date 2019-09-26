@@ -1,3 +1,3 @@
-# aragon-crud
+# arbase-crud
 
-Aragon-crud is a package to expose a CRUD-like interface from an aragon API config
+Arbase-crud is a package to expose a CRUD-like interface from an arbase API config

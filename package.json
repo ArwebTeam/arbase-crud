@@ -1,13 +1,13 @@
 {
-  "name": "aragon-crud",
+  "name": "arbase-crud",
   "version": "0.0.1",
-  "description": "Aragon-crud is a package to expose a CRUD-like interface from an aragon API config",
+  "description": "Arbase-crud is a package to expose a CRUD-like interface from an arbase API config",
   "main": "src/compile/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "aragon",
+    "arbase",
     "crud",
     "arweave"
   ],
@@ -16,10 +16,10 @@
   "license": "MPL-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkg20001/aragon-crud.git"
+    "url": "git+https://github.com/mkg20001/arbase-crud.git"
   },
   "bugs": {
-    "url": "https://github.com/mkg20001/aragon-crud/issues"
+    "url": "https://github.com/mkg20001/arbase-crud/issues"
   },
-  "homepage": "https://github.com/mkg20001/aragon-crud#readme"
+  "homepage": "https://github.com/mkg20001/arbase-crud#readme"
 }
