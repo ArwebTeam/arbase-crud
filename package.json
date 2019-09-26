@@ -1,0 +1,17 @@
+{
+  "name": "aragon-crud",
+  "version": "0.0.1",
+  "description": "Aragon-crud is a package to expose a CRUD-like interface from an aragon API config",
+  "main": "src/compile/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "aragon",
+    "crud",
+    "arweave"
+  ],
+  "runtime": "src/runtime/index.js",
+  "author": "Maciej Krüger <mkg20001@gmail.com>",
+  "license": "MPL-2.0"
+}
