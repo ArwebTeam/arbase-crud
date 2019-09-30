@@ -1,17 +1,23 @@
 'use strict'
 
-module.exports.compileEndpoint = ({prefix}, entry) => {
-  return `a.route({
-    method: 'GET',
-    path: '${prefix}/${entry.name}',
-    validate: {
-      query: Joi.object({
-        page: Joi.number().integer().default(1),
-        perPage: Joi.number().integer
-      })
-    }
-    handler: () => {
+function compileEndpoint ({prefix}, entry) {
+  const name = (entry.ns ? entry.ns + '.' : '') + entry
 
-    }
+  return `crud({
+    server,
+    name: ${JSON.stringify(name)}
+    entry: {
+      validator: ${entry.validator},
+      lists: ${entry.attributes.filter(a => a.isList)}
+    },
+    prefix: ${JSON.stringify(prefix)},
+    middleware: {}
   })`
 }
+
+function compile (data) {
+  let insert = data.entries.map(entry =>
+    compileEndpoint(entry)).join('\n')
+}
+
+module.exports = compile

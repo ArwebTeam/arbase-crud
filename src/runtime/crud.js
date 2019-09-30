@@ -192,7 +192,6 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
   server.route({
     method: 'DELETE',
     path: `${base}/{id}`,
-    // TODO:  params validate
     config: generateConfig(entry, false, true, false),
     handler: async (request, h) => {
       await m('pre', 'delete', request, h)
