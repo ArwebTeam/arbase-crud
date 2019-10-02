@@ -12,7 +12,7 @@ function compileEndpoint ({prefix}, entry, helper) {
 
   return `crud({
     server,
-    name: ${JSON.stringify(name)}
+    name: ${JSON.stringify(name)},
     entry: ${helper.stringifyEntry(entry)},
     prefix: ${JSON.stringify(prefix)},
     middleware: {},
