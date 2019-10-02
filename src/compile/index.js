@@ -20,6 +20,7 @@ function compile (data) {
     compileEndpoint(entry)).join('\n')
 
   return `const crud = require('aragon-crud')
+  const Joi = require('@hapi/joi')
   ${insert}`
 }
 
