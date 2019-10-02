@@ -36,7 +36,7 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
   const base = `${prefix}/${name}`
 
   async function m (type, stage, request, h, result) {
-    let parsed = { op: stage, performer: request.auth } // TODO: rewrite to use arweave profile
+    let parsed = { op: stage, performer: request.auth } // TODO: rewrite to use arweave profile for performer
 
     switch (type) {
       case 'pre': {
