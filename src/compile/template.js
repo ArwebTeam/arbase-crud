@@ -1,10 +1,10 @@
 'use strict'
 
-module.exports = async (main) => {
-  const crud = require('aragon-crud')
-  const Joi = require('@hapi/joi')
+const {crud} = require('arbase-crud')
+const Joi = require('@hapi/joi')
 
-  const {arweave} = main
+module.exports = async (server) => {
+  const {arweave} = server
 
   /* INSERT */
 }
