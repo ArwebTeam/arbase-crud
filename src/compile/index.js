@@ -1,5 +1,10 @@
 'use strict'
 
+const fs = require('fs')
+const path = require('path')
+
+const template = String(fs.readFileSync(path.join(__dirname, 'template.js')))
+
 function compileEndpoint ({prefix}, entry, helper) {
   if (!entry) return ''
 
@@ -10,7 +15,8 @@ function compileEndpoint ({prefix}, entry, helper) {
     name: ${JSON.stringify(name)}
     entry: ${helper.stringifyEntry(entry)},
     prefix: ${JSON.stringify(prefix)},
-    middleware: {}
+    middleware: {},
+    arweave
   })`
 }
 
@@ -18,9 +24,7 @@ function compile (data, helper) {
   let insert = data.entries.map(entry =>
     compileEndpoint({}, entry, helper)).join('\n')
 
-  return `const crud = require('aragon-crud')
-  const Joi = require('@hapi/joi')
-  ${insert}`
+  return template.replace('/* INSERT */', insert)
 }
 
 module.exports = compile

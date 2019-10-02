@@ -29,7 +29,7 @@ function generateConfig (entry, valPayload, valId, valPage) {
   return out
 }
 
-module.exports = ({server, entry, name, prefix, middleware}) => {
+module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
   // TODO: use joi
   if (!middleware) { middleware = {} }
 
@@ -95,7 +95,7 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
   entry.attributes.filter(a => a.isList).forEach(list => {
     server.route({
       method: 'GET',
-      path: `${base}/${id}/${list.name}`,
+      path: `${base}/{id}/${list.name}`,
       // TODO: where, payload validate, param validate, limit, id-based pagination
       config: generateConfig(entry, false, false, true),
       handler: async (request, h) => {
