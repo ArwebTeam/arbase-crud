@@ -92,7 +92,7 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
 
   // R is for Read
 
-  entry.lists.forEach(list => {
+  entry.attributes.filter(a => a.isList).forEach(list => {
     server.route({
       method: 'GET',
       path: `${base}/${id}/${list.name}`,
