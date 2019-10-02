@@ -3,6 +3,8 @@
 const Boom = require('@hapi/boom')
 const Joi = require('@hapi/joi')
 
+const client = require('arbase/src/client')
+
 function generateConfig (entry, valPayload, valId, valPage) {
   const out = { validate: {} }
 
@@ -79,7 +81,7 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
       await m('pre', 'create', request, h)
 
       try {
-        const res = await model.create(request.payload)
+        const res = await client.update.entryCreate(arweave, entry, request.payload)
         return h.response(res).code(200)
       } catch (error) {
         // TODO: better errorss
@@ -90,44 +92,41 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
 
   // R is for Read
 
-  server.route({
-    method: 'GET',
-    path: base,
-    // TODO: where, payload validate, param validate, limit, id-based pagination
-    config: generateConfig(entry, false, false, true),
-    handler: async (request, h) => {
-      await m('pre', 'read', request, h)
+  entry.lists.forEach(list => {
+    server.route({
+      method: 'GET',
+      path: `${base}/${id}/${list.name}`,
+      // TODO: where, payload validate, param validate, limit, id-based pagination
+      config: generateConfig(entry, false, false, true),
+      handler: async (request, h) => {
+        await m('pre', 'read', request, h)
 
-      // TODO: where filters
-      const {page, perPage} = request.query
+        // TODO: where filters
+        const {page, perPage} = request.query
 
-      try {
-        // TODO: add include
-        // TODO: where filter, limit, id-based pagination
+        try {
+          // TODO: add include
+          // TODO: where filter, limit, id-based pagination
 
-        const offset = (page - 1) * perPage
+          const { id } = request.params
+          const offset = (page - 1) * perPage
 
-        const res = await model.findAndCountAll({
-          limit: perPage,
-          offset,
-          order: [
-            ['id', 'ASC']
-          ]
-        })
+          const res = await client.fetch.fetchList(arweave, entry, list, id, list.name)
 
-        await m('post', 'read', request, h, res)
+          await m('post', 'read', request, h, res)
 
-        return h.response(res.rows)
-          .header('X-Total-Count', res.count)
-          .header('X-Current-Page', page)
-          .header('X-Per-Page', perPage)
-          .header('X-Has-Next', JSON.stringify(offset < res.count))
-          .header('X-Has-Prev', JSON.stringify(Boolean(offset)))
-          .code(200)
-      } catch (error) {
-        throw Boom.badImplementation(error.message)
+          return h.response(res.rows)
+            .header('X-Total-Count', res.count)
+            .header('X-Current-Page', page)
+            .header('X-Per-Page', perPage)
+            .header('X-Has-Next', JSON.stringify(offset < res.count))
+            .header('X-Has-Prev', JSON.stringify(Boolean(offset)))
+            .code(200)
+        } catch (error) {
+          throw Boom.badImplementation(error.message)
+        }
       }
-    }
+    })
   })
 
   server.route({
@@ -140,10 +139,7 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
 
       try {
         const { id } = request.params
-        const res = await model.findOne({
-          where: { id }
-          // TODO: add include
-        })
+        const res = await client.fetch.fetchEntry(arweave, entry, id)
         await m('post', 'read', request, h, res)
 
         if (res) {
@@ -169,15 +165,12 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
 
       try {
         const { id } = request.params
-        const [ updated ] = await model.update(request.payload, {
-          where: { id }
-        })
+        const updated = await client.update.entryUpdate(arweave, entry, id)
 
         await m('post', 'update', request, h, updated)
 
         if (updated) {
-          const res = await model.findOne({ where: { id } })
-          return h.response(res).code(200)
+          return h.response(updated).code(200)
         } else {
           throw Boom.notFound(`${name} with ID ${id} does not exist!`)
         }
@@ -198,9 +191,7 @@ module.exports = ({server, entry, name, prefix, middleware}) => {
 
       try {
         const { id } = request.params
-        const deleted = await model.destroy({
-          where: { id }
-        })
+        const deleted = await client.update.entryDelete(arweave, entry, id)
 
         await m('post', 'delete', request, h, deleted)
 
