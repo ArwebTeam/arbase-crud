@@ -18,6 +18,9 @@ function compileEndpoint ({prefix}, entry) {
 function compile (data) {
   let insert = data.entries.map(entry =>
     compileEndpoint(entry)).join('\n')
+
+  return `const crud = require('aragon-crud')
+  ${insert}`
 }
 
 module.exports = compile
