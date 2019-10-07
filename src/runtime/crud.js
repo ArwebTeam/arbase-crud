@@ -70,6 +70,16 @@ module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
     }))
   }
 
+  function processError (error) {
+    console.error(error)
+
+    if (error.isBoom) {
+      throw error
+    } else {
+      throw Boom.badImplementation(error.message)
+    }
+  }
+
   // C is for Create
 
   server.route({
@@ -148,7 +158,7 @@ module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
           throw Boom.notFound(`${name} with ID ${id} does not exist!`)
         }
       } catch (error) {
-        throw Boom.badImplementation(error.message)
+        processError(error)
       }
     }
   })
