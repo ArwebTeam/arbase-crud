@@ -3,8 +3,6 @@
 const Boom = require('@hapi/boom')
 const Joi = require('@hapi/joi')
 
-const client = require('arbase/src/client')
-
 function generateConfig (entry, valPayload, valId, valPage) {
   const out = { validate: {} }
 
@@ -29,7 +27,7 @@ function generateConfig (entry, valPayload, valId, valPage) {
   return out
 }
 
-module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
+module.exports = ({server, entry, name, prefix, middleware, client}) => {
   // TODO: use joi
   if (!middleware) { middleware = {} }
 
@@ -91,7 +89,7 @@ module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
       await m('pre', 'create', request, h)
 
       try {
-        const res = await client.write.entryCreate(arweave, entry, request.payload)
+        const res = await client.write.entryCreate(entry, request.payload)
         return h.response(res).code(200)
       } catch (error) {
         // TODO: better errorss
@@ -121,7 +119,7 @@ module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
           const { id } = request.params
           const offset = (page - 1) * perPage
 
-          const res = await client.read.list(arweave, entry, list, id, list.name)
+          const res = await client.read.list(entry, list, id, list.name)
 
           await m('post', 'read', request, h, res)
 
@@ -149,7 +147,7 @@ module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
 
       try {
         const { id } = request.params
-        const res = await client.read.entry(arweave, entry, id)
+        const res = await client.read.entry(entry, id)
         await m('post', 'read', request, h, res)
 
         if (res) {
@@ -175,7 +173,7 @@ module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
 
       try {
         const { id } = request.params
-        const updated = await client.write.entryUpdate(arweave, entry, id)
+        const updated = await client.write.entryUpdate(entry, id)
 
         await m('post', 'update', request, h, updated)
 
@@ -201,7 +199,7 @@ module.exports = ({server, entry, name, prefix, middleware, arweave}) => {
 
       try {
         const { id } = request.params
-        const deleted = await client.write.entryDelete(arweave, entry, id)
+        const deleted = await client.write.entryDelete(entry, id)
 
         await m('post', 'delete', request, h, deleted)
 
