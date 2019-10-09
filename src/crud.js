@@ -151,7 +151,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
         await m('post', 'read', request, h, res)
 
         if (res) {
-          return h.response(res).code(200)
+          return h.response(res.data).header('x-is-live', String(res.live)).code(200)
         } else {
           throw Boom.notFound(`${name} with ID ${id} does not exist!`)
         }
