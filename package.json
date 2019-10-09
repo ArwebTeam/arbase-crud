@@ -2,7 +2,7 @@
   "name": "arbase-crud",
   "version": "0.1.0",
   "description": "Arbase-crud is a package to expose a CRUD-like interface from an arbase API config",
-  "main": "src/runtime/index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,7 +11,6 @@
     "crud",
     "arweave"
   ],
-  "compile": "src/compile/index.js",
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MPL-2.0",
   "repository": {
