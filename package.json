@@ -25,5 +25,10 @@
   "dependencies": {
     "@hapi/boom": "^8.0.1",
     "@hapi/joi": "^16.1.5"
+  },
+  "peerDependencies": {
+    "arbase": ">=0.1.0"
+  },
+  "devDependencies": {
   }
 }
