@@ -123,7 +123,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
         return h.response(Object.keys(data).reduce((a, b) => {
           a[b] = data[b]
         }, []))
-          .headers('x-is-live', live)
+          .header('x-is-live', live)
 
         // TODO: rework with pagination and sanity
 
