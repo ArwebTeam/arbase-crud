@@ -118,7 +118,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
         // TODO: add include
         // TODO: where filter, limit, id-based pagination
 
-        const {data, live} = await client.read.query(`SELECT ${entry.fullName} WHERE equals(board, $1)`, {params: [request.query.board], lang: 'fnc'})
+        const {data, live} = await client.read.query(`SELECT ${entry.fullName} WHERE 'equals(board, $1)'`, {params: [request.query.board], arqlLang: 'fnc'})
 
         return h.response(Object.keys(data).reduce((a, b) => {
           a[b] = data[b]
@@ -164,7 +164,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
 
       try {
         const { id } = request.params
-        const res = await client.read.query(`SELECT SINGLE ${entry.fullName} WHERE equals(i, $1)`, {params: [id], lang: 'fnc'})
+        const res = await client.read.query(`SELECT SINGLE ${entry.fullName} WHERE 'equals(i, $1)'`, {params: [id], arqlLang: 'fnc'})
         await m('post', 'read', request, h, res)
 
         if (res) {
