@@ -3,10 +3,10 @@
 const crud = require('./crud')
 const Client = require('arbase/src/client')
 
-module.exports = (server, {entry, entries}, {prefix}) => {
-  const client = Client(server.arweave)
+module.exports = (server, e, {prefix}) => {
+  const client = Client(server.arweave, e)
 
-  entries.forEach(entry => {
+  e.entries.forEach(entry => {
     crud({
       server,
       name: entry.fullName,

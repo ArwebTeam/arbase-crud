@@ -93,10 +93,10 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
 
       try {
         const res = await client.write.entryCreate(entry, request.payload)
+
         return h.response(res).code(200)
       } catch (error) {
-        // TODO: better errorss
-        throw Boom.badImplementation(error.message)
+        throw processError(error)
       }
     }
   })
@@ -118,7 +118,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
         // TODO: add include
         // TODO: where filter, limit, id-based pagination
 
-        const {data, live} = await client.read.query(`SELECT SINGLE ${entry.fullName} WHERE equals(id, $1)`, {params: [id], lang: 'fnc'})
+        const {data, live} = await client.read.query(`SELECT ${entry.fullName} WHERE equals(board, $1)`, {params: [request.query.board], lang: 'fnc'})
 
         return h.response(Object.keys(data).reduce((a, b) => {
           a[b] = data[b]
@@ -149,7 +149,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
             .header('X-Has-Prev', JSON.stringify(Boolean(offset)))
             .code(200) */
       } catch (error) {
-        throw Boom.badImplementation(error.message)
+        throw processError(error)
       }
     }
   })
