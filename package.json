@@ -1,6 +1,6 @@
 {
   "name": "arbase-crud",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Arbase-crud is a package to expose a CRUD-like interface from an arbase API config",
   "main": "src/index.js",
   "scripts": {
