@@ -100,25 +100,34 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
 
   // R is for Read
 
-  entry.attributes.filter(a => a.isList).forEach(list => {
-    server.route({
-      method: 'GET',
-      path: `${base}/{id}/${list.name}`,
-      // TODO: where, payload validate, param validate, limit, id-based pagination
-      config: generateConfig(entry, false, false, true),
-      handler: async (request, h) => {
-        await m('pre', 'read', request, h)
+  server.route({
+    method: 'GET',
+    path: `${base}`,
+    // TODO: where, payload validate, param validate, limit, id-based pagination
+    config: generateConfig(entry, false, false, true),
+    handler: async (request, h) => {
+      await m('pre', 'read', request, h)
 
-        // TODO: where filters
-        const {page, perPage} = request.query
+      // TODO: where filters
+      // const {page, perPage} = request.query
 
-        try {
-          // TODO: add include
-          // TODO: where filter, limit, id-based pagination
+      try {
+        // TODO: add include
+        // TODO: where filter, limit, id-based pagination
 
-          const { id } = request.params
+        const {data, live} = await client.read.query(`SELECT SINGLE ${entry.fullName} WHERE equals(id, $1)`, {params: [id], lang: 'fnc'})
+
+        return h.response(Object.keys(data).reduce((a, b) => {
+          a[b] = data[b]
+        }, []))
+          .headers('x-is-live', live)
+
+        // TODO: rework with pagination and sanity
+
+        /* const { id } = request.params
           const offset = (page - 1) * perPage
 
+          client.read.query(`SELECT SINGLE ${entry.fullName} WHERE equals(id, $1)`, {params: [id], lang: 'fnc'})
           const {data: items, total: count} = await client.read.list(entry, list, id, { offset, limit: perPage })
 
           const res = {
@@ -135,12 +144,11 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
             .header('X-Per-Page', perPage)
             .header('X-Has-Next', JSON.stringify(offset < res.count))
             .header('X-Has-Prev', JSON.stringify(Boolean(offset)))
-            .code(200)
-        } catch (error) {
-          throw Boom.badImplementation(error.message)
-        }
+            .code(200) */
+      } catch (error) {
+        throw Boom.badImplementation(error.message)
       }
-    })
+    }
   })
 
   server.route({
@@ -153,7 +161,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
 
       try {
         const { id } = request.params
-        const res = await client.read.entry(entry, id)
+        const res = await client.read.query(`SELECT SINGLE ${entry.fullName} WHERE equals(i, $1)`, {params: [id], lang: 'fnc'})
         await m('post', 'read', request, h, res)
 
         if (res) {
