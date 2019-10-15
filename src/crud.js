@@ -119,7 +119,13 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
           const { id } = request.params
           const offset = (page - 1) * perPage
 
-          const res = await client.read.list(entry, list, id, list.name)
+          const {data: items, total: count} = await client.read.list(entry, list, id, { offset, limit: perPage })
+
+          const res = {
+            // TODO: get entry element for actual element via listEntry
+            rows: await Promise.all(items.map(item => client.read.list(entry, item))),
+            count
+          }
 
           await m('post', 'read', request, h, res)
 
