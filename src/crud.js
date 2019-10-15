@@ -14,7 +14,10 @@ function generateConfig (entry, valPayload, valId, valPage) {
   }
 
   if (valPayload) {
-    out.validate.payload = entry.validator
+    out.validate.payload = Joi.object({
+      item: entry.validator.required(),
+      tags: Joi.object()
+    })
   }
 
   if (valPage) {
