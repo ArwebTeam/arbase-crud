@@ -24,7 +24,7 @@ function generateConfig (entry, valPayload, valId, valPage) {
     out.validate.query = Joi.object({
       page: Joi.number().integer().min(1).default(1),
       perPage: Joi.number().integer().default(25).max(1024)
-    })
+    }).unknown(true) // TODO: include tags from model
   }
 
   return out
@@ -118,6 +118,7 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
         // TODO: add include
         // TODO: where filter, limit, id-based pagination
 
+        // TODO: read tags from model
         const {data, live} = await client.read.query(`SELECT ${entry.fullName} WHERE 'equals(board, $1)'`, {params: [request.query.board], arqlLang: 'fnc'})
 
         return h.response(Object.keys(data).reduce((a, b) => {
