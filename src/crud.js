@@ -30,7 +30,7 @@ function generateConfig (entry, valPayload, valId, valPage) {
   return out
 }
 
-module.exports = ({server, entry, name, prefix, middleware, client}) => {
+module.exports = ({server, entry, name, prefix, middleware, client, arweave}) => {
   // TODO: use joi
   if (!middleware) { middleware = {} }
 
@@ -92,7 +92,9 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
       await m('pre', 'create', request, h)
 
       try {
-        const res = await client.write.entryCreate(entry, request.payload)
+        const tx = await client.write.entryCreate(entry, request.payload.tags, request.payload.item)
+        // TODO: shim sign?
+        const res = await arweave.transactions.post(tx)
 
         return h.response(res).code(200)
       } catch (error) {
@@ -196,7 +198,8 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
         await m('post', 'update', request, h, updated)
 
         if (updated) {
-          return h.response(updated).code(200)
+          // TODO: shim sign?
+          return h.response(await arweave.transactions.post(updated)).code(200)
         } else {
           throw Boom.notFound(`${name} with ID ${id} does not exist!`)
         }
@@ -222,7 +225,8 @@ module.exports = ({server, entry, name, prefix, middleware, client}) => {
         await m('post', 'delete', request, h, deleted)
 
         if (deleted) {
-          return h.response({ok: true}).code(200)
+          // TODO: shim sign?
+          return h.response(await arweave.transactions.post(deleted)).code(200)
         } else {
           return h.response({ok: true, soft404: true}).code(200)
         }
