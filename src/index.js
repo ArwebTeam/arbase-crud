@@ -1,7 +1,7 @@
 'use strict'
 
 const crud = require('./crud')
-const Client = require('../../arbase/src/client')
+const Client = require('arbase/src/client')
 
 module.exports = (server, e, {prefix}) => {
   // TODO: add .post() function to entry TXs
@@ -11,7 +11,7 @@ module.exports = (server, e, {prefix}) => {
     crud({
       server,
       name: entry.fullName,
-      arweave,
+      arweave: server.arweave,
       entry,
       prefix,
       middleware: {},

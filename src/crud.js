@@ -93,10 +93,7 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
 
       try {
         const tx = await client.write.entryCreate(entry, request.payload.tags, request.payload.item)
-        // TODO: shim sign?
-        const res = await arweave.transactions.post(tx)
-
-        return h.response(res).code(200)
+        return h.response(await tx.post()).code(200)
       } catch (error) {
         throw processError(error)
       }
@@ -124,7 +121,8 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
         const {data, live} = await client.read.query(`SELECT ${entry.fullName} WHERE 'equals(board, $1)'`, {params: [request.query.board], arqlLang: 'fnc'})
 
         return h.response(Object.keys(data).reduce((a, b) => {
-          a[b] = data[b]
+          a.push(data[b])
+          return a
         }, []))
           .header('x-is-live', live)
 
@@ -198,8 +196,7 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
         await m('post', 'update', request, h, updated)
 
         if (updated) {
-          // TODO: shim sign?
-          return h.response(await arweave.transactions.post(updated)).code(200)
+          return h.response(await updated.post()).code(200)
         } else {
           throw Boom.notFound(`${name} with ID ${id} does not exist!`)
         }
@@ -226,7 +223,7 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
 
         if (deleted) {
           // TODO: shim sign?
-          return h.response(await arweave.transactions.post(deleted)).code(200)
+          return h.response(await deleted.post()).code(200)
         } else {
           return h.response({ok: true, soft404: true}).code(200)
         }
