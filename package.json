@@ -23,11 +23,10 @@
   "homepage": "https://github.com/mkg20001/arbase-crud#readme",
   "dependencies": {
     "@hapi/boom": "^8.0.1",
-    "@hapi/joi": "^16.1.7",
-    "arbase": "^0.2.0"
+    "@hapi/joi": "^16.1.7"
   },
   "peerDependencies": {
-    "arbase": ">=0.1.0"
+    "arbase": ">=0.2.0"
   },
   "devDependencies": {}
 }
