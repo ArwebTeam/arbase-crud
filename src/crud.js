@@ -2,6 +2,7 @@
 
 const Boom = require('@hapi/boom')
 const Joi = require('@hapi/joi')
+const { and, or, equals } = require('arql-ops')
 
 function generateConfig (entry, valPayload, valId, valPage) {
   const out = { validate: {} }
@@ -30,7 +31,7 @@ function generateConfig (entry, valPayload, valId, valPage) {
   return out
 }
 
-module.exports = ({server, entry, name, prefix, middleware, client, arweave}) => {
+module.exports = ({ server, entry, name, prefix, middleware, client, arweave }) => {
   // TODO: use joi
   if (!middleware) { middleware = {} }
 
@@ -39,7 +40,7 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
   const base = `${prefix}/${name}`
 
   async function m (type, stage, request, h, result) {
-    let parsed = { op: stage, performer: request.auth } // TODO: rewrite to use arweave profile for performer
+    const parsed = { op: stage, performer: request.auth } // TODO: rewrite to use arweave profile for performer
 
     switch (type) {
       case 'pre': {
@@ -65,7 +66,7 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
       if (middleware[name]) {
         const a = Array.isArray(middleware[name]) ? middleware[name] : [middleware[name]]
         for (let i = 0; i < a.length; i++) {
-          await a[i](parsed, {request, h, entry})
+          await a[i](parsed, { request, h, entry })
         }
       }
     }))
@@ -102,6 +103,8 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
 
   // R is for Read
 
+  const tags = ['board', 'p'] // TODO: do this via arbase.js config
+
   server.route({
     method: 'GET',
     path: `${base}`,
@@ -118,7 +121,19 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
         // TODO: where filter, limit, id-based pagination
 
         // TODO: read tags from model
-        const {data, live} = await client.read.query(`SELECT ${entry.fullName} WHERE 'equals(board, $1)'`, {params: [request.query.board], arqlLang: 'fnc'})
+
+        const qParams = tags.filter(t => request.query[t]).map(t => equals(t, request.query[t]))
+
+        if (!qParams.length) {
+          throw Boom.badRequest('Needs at least one tag to query by (example: p)')
+        }
+
+        // const { data, live } = await client.read.query(`SELECT ${entry.fullName} WHERE 'equals(board, $1)'`, { params: [request.query.board], arqlLang: 'fnc' })
+        const { data, live } = await client.read.query({
+          type: entry, // only need ns, name but full object also works (TODO: refactor this to read directly from typeObj)
+          typeObj: entry,
+          arql: and(...qParams)
+        })
 
         return h.response(Object.keys(data).reduce((a, b) => {
           a.push(data[b])
@@ -165,11 +180,11 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
 
       try {
         const { id } = request.params
-        const res = await client.read.query(`SELECT SINGLE ${entry.fullName} WHERE 'equals(i, $1)'`, {params: [id], arqlLang: 'fnc'})
+        const res = await client.read.query(`SELECT SINGLE ${entry.fullName} WHERE 'equals(i, $1)'`, { params: [id], arqlLang: 'fnc' })
         await m('post', 'read', request, h, res)
 
         if (res) {
-          return h.response(res.data).header('x-is-live', String(res.live)).code(200)
+          return h.response(res.data[id]).header('x-is-live', String(res.live)).code(200)
         } else {
           throw Boom.notFound(`${name} with ID ${id} does not exist!`)
         }
@@ -225,7 +240,7 @@ module.exports = ({server, entry, name, prefix, middleware, client, arweave}) =>
           // TODO: shim sign?
           return h.response(await deleted.post()).code(200)
         } else {
-          return h.response({ok: true, soft404: true}).code(200)
+          return h.response({ ok: true, soft404: true }).code(200)
         }
       } catch (error) {
         throw Boom.badImplementation(error.message)
