@@ -84,7 +84,7 @@ module.exports = ({ server, entry, name, prefix, middleware, client, arweave }) 
 
   // C is for Create
 
-  server.route({
+  server.router.route({
     method: 'POST',
     path: base,
     // TODO:  payload validate
@@ -105,7 +105,7 @@ module.exports = ({ server, entry, name, prefix, middleware, client, arweave }) 
 
   const tags = ['board', 'p'] // TODO: do this via arbase.js config
 
-  server.route({
+  server.router.route({
     method: 'GET',
     path: `${base}`,
     // TODO: where, payload validate, param validate, limit, id-based pagination
@@ -170,7 +170,7 @@ module.exports = ({ server, entry, name, prefix, middleware, client, arweave }) 
     }
   })
 
-  server.route({
+  server.router.route({
     method: 'GET',
     path: `${base}/{id}`,
     // TODO: params validate
@@ -196,7 +196,7 @@ module.exports = ({ server, entry, name, prefix, middleware, client, arweave }) 
 
   // U is for Update
 
-  server.route({
+  server.router.route({
     method: 'POST',
     path: `${base}/{id}`,
     // TODO:  payload validate, params validate
@@ -223,7 +223,7 @@ module.exports = ({ server, entry, name, prefix, middleware, client, arweave }) 
 
   // D is for Delte
 
-  server.route({
+  server.router.route({
     method: 'DELETE',
     path: `${base}/{id}`,
     config: generateConfig(entry, false, true, false),
