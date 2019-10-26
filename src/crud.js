@@ -94,7 +94,8 @@ module.exports = ({ server, entry, name, prefix, middleware, client, arweave }) 
 
       try {
         const tx = await client.write.entryCreate(entry, request.payload.tags, request.payload.item)
-        return h.response(await tx.post()).code(200)
+        await tx.post()
+        return h.response(tx.rid).code(200)
       } catch (error) {
         throw processError(error)
       }
